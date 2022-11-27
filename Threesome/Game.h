@@ -20,7 +20,7 @@ private:
 	uint32_t get_index_by_mouse_position(const sf::Vector2i& mouse_position);
 	enum gem_color { gc_orange, gc_green, gc_red, gc_blue, gc_violet, gc_black, gc_count };
 	void load_textures(std::string file_path, gem_color index);
-	void searchCol();
+	uint32_t searchCol(uint32_t index_1, uint32_t index_2);
 
 	struct Gem {
 		sf::RectangleShape rect;
@@ -35,6 +35,7 @@ private:
 	bool m_success_move{ false };
 	uint32_t m_selected_index_1;
 	uint32_t m_selected_index_2;
+	uint32_t m_valid_move;
 	uint32_t m_rows{ 8 };
 	uint32_t m_columns{ 8 };
 

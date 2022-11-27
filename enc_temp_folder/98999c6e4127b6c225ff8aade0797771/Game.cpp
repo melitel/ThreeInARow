@@ -172,34 +172,34 @@ void Game::update()
 	}
 
 	if (!m_gems_to_destroy.empty()) {
-// 
-// 		for (uint32_t i = 0; i < m_rows; ++i)
-// 		{
-// 			int index = m_columns * (m_rows - 1) + i;
-// 
-// 			for (int j = index; j >= 0; j -= 8)
-// 			{
-// 				if (m_gems_array[j].color == gem_color::gc_black)
-// 				{					
-// 					int element_to_swap_with = j;
-// 
-// 					while (element_to_swap_with > 0 && m_gems_array[element_to_swap_with].color == gem_color::gc_black)
-// 					{
-// 						element_to_swap_with -= 8;
-// 					}
-// 
-// 					if (element_to_swap_with < 0 || element_to_swap_with == 0)
-// 					{
-// 						m_gems_array[j].color = (gem_color)distr(gen);
-// 					}
-// 					else {
-// 						m_gems_array[j].color = m_gems_array[element_to_swap_with].color;
-// 						m_gems_array[element_to_swap_with].color = gem_color::gc_black;
-// 					}
-// 
-// 				}
-// 			}
-// 		}
+
+		for (uint32_t i = 0; i < m_rows; ++i)
+		{
+			int index = m_columns * (m_rows - 1) + i;
+
+			for (int j = index; j >= 0; j -= 8)
+			{
+				if (m_gems_array[j].color == gem_color::gc_black)
+				{					
+					int element_to_swap_with = j;
+
+					while (element_to_swap_with > 0 && m_gems_array[element_to_swap_with].color == gem_color::gc_black)
+					{
+						element_to_swap_with -= 8;
+					}
+
+					if (element_to_swap_with < 0 || element_to_swap_with == 0)
+					{
+						m_gems_array[j].color = (gem_color)distr(gen);
+					}
+					else {
+						m_gems_array[j].color = m_gems_array[element_to_swap_with].color;
+						m_gems_array[element_to_swap_with].color = gem_color::gc_black;
+					}
+
+				}
+			}
+		}
 	}
 
 	m_gems_to_destroy.clear();
