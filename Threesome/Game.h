@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <array>
 #include <random>
+#include <set>
 
 
 class Game
@@ -22,6 +23,7 @@ private:
 	void load_textures(std::string file_path, gem_color index);
 	uint32_t searchCol(uint32_t index_1, uint32_t index_2);
 
+	void move_check(uint32_t index, gem_color color);
 	struct Gem {
 		sf::RectangleShape rect;
 		gem_color color;
@@ -48,7 +50,7 @@ private:
 
 	std::array<Game::Gem, 64> m_gems_array;
 	std::array<sf::Texture, gc_count> m_colors;
-	std::vector<uint32_t> m_gems_to_destroy;
+	std::set<uint32_t> m_gems_to_destroy;
 
 	std::random_device rd; // obtain a random number from hardware
 	std::mt19937 gen{ rd() }; // seed the generator
