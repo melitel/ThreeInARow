@@ -24,6 +24,8 @@ private:
 	uint32_t searchCol(uint32_t index_1, uint32_t index_2);
 
 	void move_check(uint32_t index, gem_color color);
+	void gems_fall();
+	void gems_swap();
 	struct Gem {
 		sf::RectangleShape rect;
 		gem_color color;
