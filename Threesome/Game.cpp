@@ -12,12 +12,10 @@ void Game::run()
 	m_selected_index_1 = INVALID_INDEX;
 	m_selected_index_2 = INVALID_INDEX;
 	m_valid_move = INVALID_INDEX;
-
-	while (m_window.isOpen()) {
-
-
+	m_window.setKeyRepeatEnabled(false);
+	
 		while (m_window.isOpen())
-		{
+		{			
 			// check all the window's events that were triggered since the last iteration of the loop
 			sf::Event event;
 			while (m_window.pollEvent(event))
@@ -34,6 +32,21 @@ void Game::run()
 						gather_input(mouse_position);
 					}
 				}
+				if (event.type == sf::Event::KeyPressed)
+				{
+					if (event.key.code == sf::Keyboard::Numpad1)
+					{
+						pain_it_black();
+					}					
+					if (event.key.code == sf::Keyboard::Numpad2)
+					{
+						gems_swap();
+					}
+					if (event.key.code == sf::Keyboard::Numpad3)
+					{
+						gems_fall();
+					}					
+				}
 			}
 
 			update();
@@ -41,7 +54,6 @@ void Game::run()
 		}
 	}
 
-}
 
 void Game::load_textures(std::string file_path, Game::gem_color index) {
 
@@ -54,12 +66,19 @@ void Game::load_textures(std::string file_path, Game::gem_color index) {
 
 void Game::initialize()
 {
+	m_player.initialize(sf::Vector2f(0.f, actor_offset_y), "hero.png");
+	m_monster.initialize(sf::Vector2f((float)(m_window_width - m_monster.get_width()), actor_offset_y), "monster.png");
+	m_background.setSize(sf::Vector2f((float)m_window_width, (float)m_window_height));
+/*	m_background.setFillColor(sf::Color::Black);*/
+	m_background.setPosition(sf::Vector2f(0.f, 0.f));
+	m_background_tex.loadFromFile("background2.jpg");
+	m_background.setTexture(&m_background_tex);
+	
 	float board_width = ((m_rows * m_gem_side) + ((m_rows + 1) * gem_offset));
 	float board_heights = ((m_columns * m_gem_side) + ((m_columns + 1) * gem_offset));
 	m_board.setSize(sf::Vector2f(board_width, board_heights));
 	m_board.setFillColor(sf::Color::Black);
-	m_board.setPosition(sf::Vector2f(0.f, 0.f));
-	m_window.draw(m_board);
+	m_board.setPosition(sf::Vector2f(200.f, 40.f));	
 
 	load_textures("gem1.png", gc_orange);
 	load_textures("gem6.png", gc_green);
@@ -93,45 +112,46 @@ void Game::initialize()
 void Game::draw()
 {
 	// clear the window with black color
-	m_window.clear(sf::Color::White);
+	m_window.clear(sf::Color::Black);
 	m_window.draw(m_board);
+	m_window.draw(m_background);
 
 	for (int i = 0; i < m_gems_array.size(); i++)
 	{
 		m_window.draw(m_gems_array[i].rect);
 	}
-
+	
+	m_player.draw(m_window);
+	m_monster.draw(m_window);
 	m_window.display();
 }
 
 void Game::update()
 {
-	if (m_selected_index_1 != INVALID_INDEX && m_selected_index_2 != INVALID_INDEX) {
+	
+		if (m_selected_index_1 != INVALID_INDEX && m_selected_index_2 != INVALID_INDEX) {
 
-		gem_color color = m_gems_array[m_selected_index_1].color;
-		m_gems_array[m_selected_index_1].color = m_gems_array[m_selected_index_2].color;
-		m_gems_array[m_selected_index_2].color = color;
-		m_gems_array[m_selected_index_1].rect.setOutlineThickness(0);
+			gem_color color = m_gems_array[m_selected_index_1].color;
+			m_gems_array[m_selected_index_1].color = m_gems_array[m_selected_index_2].color;
+			m_gems_array[m_selected_index_2].color = color;
+			m_gems_array[m_selected_index_1].rect.setOutlineThickness(0);
 
-		m_valid_move = searchCol(m_selected_index_1, m_selected_index_2);
+			m_valid_move = searchCol(m_selected_index_1, m_selected_index_2);
 
-		if (m_valid_move == 1)
-		{
-			m_selected_index_1 = INVALID_INDEX;
-			m_selected_index_2 = INVALID_INDEX;
-			m_valid_move = INVALID_INDEX;						
-		}
-		else {
-			
-			m_gems_array[m_selected_index_2].color = m_gems_array[m_selected_index_1].color;
-			m_gems_array[m_selected_index_1].color = color;
-			m_selected_index_1 = INVALID_INDEX;
-			m_selected_index_2 = INVALID_INDEX;
-		}
+			if (m_valid_move == 1)
+			{
+				m_selected_index_1 = INVALID_INDEX;
+				m_selected_index_2 = INVALID_INDEX;
+				m_valid_move = INVALID_INDEX;
+			}
+			else {
 
-		gems_swap();
-		gems_fall();
-	}
+				m_gems_array[m_selected_index_2].color = m_gems_array[m_selected_index_1].color;
+				m_gems_array[m_selected_index_1].color = color;
+				m_selected_index_1 = INVALID_INDEX;
+				m_selected_index_2 = INVALID_INDEX;
+			}			
+		}	
 
 	for (int i = 0; i < m_gems_array.size(); i++)
 	{
@@ -140,6 +160,7 @@ void Game::update()
 	}
 
 }
+
 
 void Game::gather_input(const sf::Vector2i& mouse_position) {
 
@@ -271,30 +292,43 @@ void Game::move_check(uint32_t index, gem_color color) {
 
 void Game::gems_fall() {
 
-	for (int32_t i = ((m_rows * m_columns)-1); i>=0; --i)
+	for (int32_t i = ((m_rows * m_columns)-1); i>=0; i -=8)
 	{
-		gem_color color = m_gems_array[i].color;
-		move_check(i, color);
-		if (!m_gems_to_destroy.empty()) {
-			for (auto& gem_id : m_gems_to_destroy)
-			{
-				gem_color additional_color = m_gems_array[gem_id].color;
-				move_check(gem_id, additional_color);
+				
+		for (int32_t j = 0; j < m_rows; ++j) {
+			
+			int32_t index = i - j;
+			gem_color color = m_gems_array[index].color;
+			move_check(index, color);
+
+			if (!m_gems_to_destroy.empty()) {
+				for (auto& gem_id : m_gems_to_destroy)
+				{
+					gem_color additional_color = m_gems_array[gem_id].color;
+					move_check(gem_id, additional_color);
+				}
+				pain_it_black();
+				/*			gems_swap();*/
+				break;
 			}
-			gems_swap();
+		}
+	}
+}
+
+void Game:: pain_it_black() {
+
+	if (!m_gems_to_destroy.empty()) {
+		for (auto it = m_gems_to_destroy.cbegin(); it != m_gems_to_destroy.cend(); ++it)
+		{
+			uint32_t index = *it;
+			m_gems_array[index].color = gem_color::gc_black;
 		}
 	}
 }
 
 void Game::gems_swap() {
 
- 	if (!m_gems_to_destroy.empty()) {
-		for (auto it = m_gems_to_destroy.cbegin(); it != m_gems_to_destroy.cend(); ++it)
-		{
- 			uint32_t index = *it;
- 			m_gems_array[index].color = gem_color::gc_black; 
- 		}
- 	}
+	//pain_it_black()
 
 	if (!m_gems_to_destroy.empty()) {
 

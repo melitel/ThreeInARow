@@ -1,4 +1,5 @@
 #pragma once
+#include "Actor.h"
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include <array>
@@ -13,10 +14,14 @@ public:
 
 private:
 
+	Actor m_player;
+	Actor m_monster;
+
 	void initialize();
 	void draw();
 	void update();
-
+	
+	void pain_it_black();
 	void gather_input(const sf::Vector2i& mouse_position);
 	uint32_t get_index_by_mouse_position(const sf::Vector2i& mouse_position);
 	enum gem_color { gc_orange, gc_green, gc_red, gc_blue, gc_violet, gc_black, gc_count };
@@ -32,10 +37,11 @@ private:
 	};
 
 	//SFML graphics objects
-	const uint32_t m_window_width = 500;
+	const uint32_t m_window_width = 850;
 	const uint32_t m_window_height = 500;
 	const float m_gem_side = 48.f;
 	const float gem_offset{ 5 };
+	const float actor_offset_y{ 40 };
 	bool m_success_move{ false };
 	uint32_t m_selected_index_1;
 	uint32_t m_selected_index_2;
@@ -47,8 +53,10 @@ private:
 	sf::RectangleShape m_upper_border;
 	sf::RectangleShape m_lower_border;
 	sf::RectangleShape m_board;
+	sf::RectangleShape m_background;
 	sf::RectangleShape m_gem;
 	sf::Texture m_gems_texture;	
+	sf::Texture m_background_tex;
 
 	std::array<Game::Gem, 64> m_gems_array;
 	std::array<sf::Texture, gc_count> m_colors;
