@@ -1,5 +1,6 @@
 #pragma once
 #include "Actor.h"
+#include"Animation.h"
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include <array>
@@ -24,7 +25,13 @@ private:
 	void pain_it_black();
 	void gather_input(const sf::Vector2i& mouse_position);
 	uint32_t get_index_by_mouse_position(const sf::Vector2i& mouse_position);
-	enum gem_color { gc_orange, gc_green, gc_red, gc_blue, gc_violet, gc_black, gc_count };
+	enum gem_color { gc_orange, gc_green, gc_red, gc_blue, gc_violet, gc_count };
+	enum gem_status {
+		no_animation,
+		fade_animation,
+		swap_animation
+	};
+
 	void load_textures(std::string file_path, gem_color index);
 	uint32_t searchCol(uint32_t index_1, uint32_t index_2);
 
@@ -34,7 +41,19 @@ private:
 	struct Gem {
 		sf::RectangleShape rect;
 		gem_color color;
+		Animation animation;
+		sf::IntRect rectSourceSprite{ sf::Vector2i(0, 0), sf::Vector2i(500, 500) };
+		gem_status current_gem_status;
+
+		bool is_to_delete{ false };
 	};
+	enum game_state {
+		gs_waiting_for_move,
+		gs_move_in_progress
+	};
+	
+	game_state m_game_state;
+	
 
 	//SFML graphics objects
 	const uint32_t m_window_width = 850;
@@ -57,6 +76,9 @@ private:
 	sf::RectangleShape m_gem;
 	sf::Texture m_gems_texture;	
 	sf::Texture m_background_tex;
+	
+	const uint32_t m_sprite_width = 500;
+	
 
 	std::array<Game::Gem, 64> m_gems_array;
 	std::array<sf::Texture, gc_count> m_colors;
@@ -66,6 +88,13 @@ private:
 	std::mt19937 gen{ rd() }; // seed the generator
 	std::uniform_int_distribution<> distr{ 0, 4 }; // define the range
 	
+	//time logic
+	std::chrono::time_point<std::chrono::system_clock> m_time{ std::chrono::system_clock::now() };
+	std::chrono::time_point<std::chrono::system_clock> m_start_time{ std::chrono::system_clock::now() };
+	std::chrono::time_point<std::chrono::system_clock> start_animation_time = std::chrono::system_clock::now();
+	std::chrono::duration<float> m_total_time{ 0 };
+	std::chrono::duration<float> m_dt{ 0 };
+	uint64_t m_frame_id{ 0 };
 
 };
 

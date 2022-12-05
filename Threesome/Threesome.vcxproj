@@ -88,11 +88,13 @@ XCOPY $(SolutionDir)textures\ $(OutDir) /i /c /k /y /d</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Threesome.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animation.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Actor.h" />
   </ItemGroup>

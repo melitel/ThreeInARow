@@ -66,12 +66,13 @@ void Game::load_textures(std::string file_path, Game::gem_color index) {
 
 void Game::initialize()
 {
+	m_game_state = game_state::gs_waiting_for_move;
 	m_player.initialize(sf::Vector2f(0.f, actor_offset_y), "hero.png");
 	m_monster.initialize(sf::Vector2f((float)(m_window_width - m_monster.get_width()), actor_offset_y), "monster.png");
 	m_background.setSize(sf::Vector2f((float)m_window_width, (float)m_window_height));
 /*	m_background.setFillColor(sf::Color::Black);*/
 	m_background.setPosition(sf::Vector2f(0.f, 0.f));
-	m_background_tex.loadFromFile("background2.jpg");
+	m_background_tex.loadFromFile("background.jpg");
 	m_background.setTexture(&m_background_tex);
 	
 	float board_width = ((m_rows * m_gem_side) + ((m_rows + 1) * gem_offset));
@@ -80,12 +81,11 @@ void Game::initialize()
 	m_board.setFillColor(sf::Color::Black);
 	m_board.setPosition(sf::Vector2f(200.f, 40.f));	
 
-	load_textures("gem1.png", gc_orange);
-	load_textures("gem6.png", gc_green);
-	load_textures("gem3.png", gc_red);
-	load_textures("gem4.png", gc_blue);
-	load_textures("gem5.png", gc_violet);
-	load_textures("gem2.png", gc_black);
+	load_textures("gem_sprite1.png", gc_orange);
+	load_textures("gem_sprite6.png", gc_green);
+	load_textures("gem_sprite3.png", gc_red);
+	load_textures("gem_sprite4.png", gc_blue);
+	load_textures("gem_sprite5.png", gc_violet);	
 
 	for (uint32_t i = 0; i < m_rows; i++) {
 
@@ -127,8 +127,15 @@ void Game::draw()
 }
 
 void Game::update()
-{
-	
+{	
+
+	// Time logic 
+	std::chrono::time_point t = std::chrono::system_clock::now();
+	m_dt = t - m_time;
+	m_time = t;
+	m_total_time = t - m_start_time;
+	float delta = m_dt.count();	
+
 		if (m_selected_index_1 != INVALID_INDEX && m_selected_index_2 != INVALID_INDEX) {
 
 			gem_color color = m_gems_array[m_selected_index_1].color;
@@ -140,23 +147,49 @@ void Game::update()
 
 			if (m_valid_move == 1)
 			{
+				m_game_state = game_state::gs_move_in_progress;
 				m_selected_index_1 = INVALID_INDEX;
 				m_selected_index_2 = INVALID_INDEX;
 				m_valid_move = INVALID_INDEX;
+				pain_it_black();
+				//gems_swap();
+				//gems_fall();
 			}
 			else {
-
+				m_game_state = game_state::gs_waiting_for_move;
 				m_gems_array[m_selected_index_2].color = m_gems_array[m_selected_index_1].color;
 				m_gems_array[m_selected_index_1].color = color;
 				m_selected_index_1 = INVALID_INDEX;
 				m_selected_index_2 = INVALID_INDEX;
 			}			
-		}	
+		}
 
+		if (m_game_state == game_state::gs_move_in_progress)
+		{
+			if (!m_gems_to_destroy.empty())
+			{
+				uint32_t index = *m_gems_to_destroy.begin();
+				if (!m_gems_array[index].animation.is_playing())
+				{
+					gems_swap();
+					gems_fall();
+				}
+			}
+			else {
+				m_game_state = game_state::gs_waiting_for_move;
+			}
+
+		}
+			
 	for (int i = 0; i < m_gems_array.size(); i++)
 	{
 		Gem& gem = m_gems_array[i];
+		gem.animation.update(delta);
+		uint32_t frame_id = gem.animation.get_frame_id();
+		//frame_id = 1;
+		gem.rectSourceSprite.left = m_sprite_width * (frame_id-1);
 		gem.rect.setTexture(&m_colors[gem.color]);
+		gem.rect.setTextureRect(gem.rectSourceSprite);
 	}
 
 }
@@ -217,9 +250,6 @@ uint32_t Game::searchCol(uint32_t index_1, uint32_t index_2)
 		move_check(gem_id, additional_color);
 	}
 
-	if (!(m_gems_to_destroy.size() == 3 || m_gems_to_destroy.size() == 4)) {
-		int ii = 10;
-	}
 	if (!m_gems_to_destroy.empty())
 	{
 		return 1;
@@ -290,13 +320,64 @@ void Game::move_check(uint32_t index, gem_color color) {
 
 }
 
+void Game:: pain_it_black() {	
+	for (auto it = m_gems_to_destroy.cbegin(); it != m_gems_to_destroy.cend(); ++it)
+	{
+		uint32_t index = *it;
+		m_gems_array[index].animation.play();
+		m_gems_array[index].is_to_delete = true;
+	}
+}
+
+void Game::gems_swap() {
+
+	//pain_it_black();
+
+	if (!m_gems_to_destroy.empty()) {
+
+		for (uint32_t i = 0; i < m_rows; ++i)
+		{
+			int index = m_columns * (m_rows - 1) + i;
+
+			for (int j = index; j >= 0; j -= 8)
+			{
+				if (m_gems_array[j].is_to_delete)
+				{
+					int element_to_swap_with = j;
+
+					while (element_to_swap_with > 0 && m_gems_array[element_to_swap_with].is_to_delete)
+					{
+						element_to_swap_with -= 8;
+					}
+
+					if (element_to_swap_with < 0 || element_to_swap_with == 0)
+					{
+						m_gems_array[j].color = (gem_color)distr(gen);
+						m_gems_array[j].is_to_delete = false;
+						m_gems_array[j].animation.reset();
+					}
+					else {
+						m_gems_array[j].color = m_gems_array[element_to_swap_with].color;
+						m_gems_array[j].is_to_delete = false;
+						m_gems_array[element_to_swap_with].is_to_delete = true;
+						m_gems_array[j].animation.reset();
+						//m_gems_array[element_to_swap_with].animation.reset();
+					}
+				}
+			}
+		}
+	}
+
+	m_gems_to_destroy.clear();
+}
+
 void Game::gems_fall() {
 
-	for (int32_t i = ((m_rows * m_columns)-1); i>=0; i -=8)
+	for (int32_t i = ((m_rows * m_columns) - 1); i >= 0; i -= 8)
 	{
-				
+
 		for (int32_t j = 0; j < m_rows; ++j) {
-			
+
 			int32_t index = i - j;
 			gem_color color = m_gems_array[index].color;
 			move_check(index, color);
@@ -307,59 +388,14 @@ void Game::gems_fall() {
 					gem_color additional_color = m_gems_array[gem_id].color;
 					move_check(gem_id, additional_color);
 				}
+
 				pain_it_black();
-				/*			gems_swap();*/
+				//gems_swap();
+
+				//i = ((m_rows * m_columns) - 1);
+				//j = 0;
 				break;
 			}
 		}
 	}
-}
-
-void Game:: pain_it_black() {
-
-	if (!m_gems_to_destroy.empty()) {
-		for (auto it = m_gems_to_destroy.cbegin(); it != m_gems_to_destroy.cend(); ++it)
-		{
-			uint32_t index = *it;
-			m_gems_array[index].color = gem_color::gc_black;
-		}
-	}
-}
-
-void Game::gems_swap() {
-
-	//pain_it_black()
-
-	if (!m_gems_to_destroy.empty()) {
-
-		for (uint32_t i = 0; i < m_rows; ++i)
-		{
-			int index = m_columns * (m_rows - 1) + i;
-
-			for (int j = index; j >= 0; j -= 8)
-			{
-				if (m_gems_array[j].color == gem_color::gc_black)
-				{
-					int element_to_swap_with = j;
-
-					while (element_to_swap_with > 0 && m_gems_array[element_to_swap_with].color == gem_color::gc_black)
-					{
-						element_to_swap_with -= 8;
-					}
-
-					if (element_to_swap_with < 0 || element_to_swap_with == 0)
-					{
-						m_gems_array[j].color = (gem_color)distr(gen);
-					}
-					else {
-						m_gems_array[j].color = m_gems_array[element_to_swap_with].color;
-						m_gems_array[element_to_swap_with].color = gem_color::gc_black;
-					}
-				}
-			}
-		}
-	}
-
-	m_gems_to_destroy.clear();
-
 }
