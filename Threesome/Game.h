@@ -25,13 +25,13 @@ private:
 	void pain_it_black();
 	void gather_input(const sf::Vector2i& mouse_position);
 	uint32_t get_index_by_mouse_position(const sf::Vector2i& mouse_position);
-	enum gem_color { gc_orange, gc_green, gc_red, gc_blue, gc_violet, gc_count };
+	enum gem_color { gc_orange, gc_green, gc_red, gc_blue, gc_violet, gc_black, gc_count };
 	enum gem_status {
 		no_animation,
 		fade_animation,
 		swap_animation
 	};
-
+	
 	void load_textures(std::string file_path, gem_color index);
 	uint32_t searchCol(uint32_t index_1, uint32_t index_2);
 
@@ -49,7 +49,9 @@ private:
 	};
 	enum game_state {
 		gs_waiting_for_move,
-		gs_move_in_progress
+		gs_destroying,
+		gs_swapping,
+		gs_gems_fall
 	};
 	
 	game_state m_game_state;

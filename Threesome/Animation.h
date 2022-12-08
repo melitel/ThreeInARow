@@ -6,11 +6,13 @@ class Animation
 {
 public:
 	void update(float dt);
-	void play();
-	void reset() { m_frame_id = 1; }
+	void play(uint32_t animation_id);
+	void reset() { m_frame_id = 1; m_animation_id = 0; }
 	bool is_playing() const { return m_state == as_active; }
 
+
 	uint32_t get_frame_id();
+	uint32_t get_animation_id();
 private:
 	enum animation_state {as_active, as_nonactive};
 	animation_state m_state{as_nonactive};
@@ -21,7 +23,8 @@ private:
 	sf::Texture m_texture;
 	const uint32_t m_texture_width = 500;
 	const uint32_t m_texture_height = 500;
-	uint32_t m_frame_id{ 1 };
-	uint32_t m_frames_count{ 7 };
+	uint32_t m_frame_id{ 0 };
+	uint32_t m_frames_count{ 8 };
+	uint32_t m_animation_id{ 0 };
 };
 
