@@ -95,7 +95,7 @@ void Game::initialize()
 	load_textures("gem_sprite3.png", gc_red);
 	load_textures("gem_sprite4.png", gc_blue);
 	load_textures("gem_sprite5.png", gc_violet);
-	load_textures("gem_sprite5.png", gc_black);
+	load_textures("gem_sprite2.png", gc_black);
 
 	for (uint32_t i = 0; i < m_rows; i++) {
 

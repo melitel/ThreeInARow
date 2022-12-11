@@ -18,7 +18,7 @@ private:
 	animation_state m_state{as_nonactive};
 	std::chrono::time_point<std::chrono::system_clock> m_start_time{ std::chrono::system_clock::now() };
 	float m_animation_time{ 0 };
-	float m_animation_total_time{ 1.3 };
+	float m_animation_total_time{ 0.5 };
 	sf::IntRect m_rectSourceSprite{ sf::Vector2i(0, 0), sf::Vector2i(500, 500) };
 	sf::Texture m_texture;
 	const uint32_t m_texture_width = 500;
