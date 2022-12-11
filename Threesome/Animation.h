@@ -7,7 +7,7 @@ class Animation
 public:
 	void update(float dt);
 	void play(uint32_t animation_id);
-	void reset() { m_frame_id = 1; m_animation_id = 0; }
+	void reset() { m_frame_id = 0; m_animation_id = 0; }
 	bool is_playing() const { return m_state == as_active; }
 
 

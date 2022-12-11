@@ -49,6 +49,7 @@ private:
 	};
 	enum game_state {
 		gs_waiting_for_move,
+		gs_processing_move,
 		gs_destroying,
 		gs_swapping,
 		gs_gems_fall
