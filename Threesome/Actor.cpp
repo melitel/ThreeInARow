@@ -2,7 +2,7 @@
 #include<iostream>
 #include <cmath>
 
-void Actor::initialize(const sf::Vector2f & pos, const std::string & name)
+void Actor::initialize_actor(const sf::Vector2f & pos, const std::string & name)
 {
 	
 	m_actor.setPosition(pos);
@@ -14,13 +14,45 @@ void Actor::initialize(const sf::Vector2f & pos, const std::string & name)
 	else {
 		m_actor.setTexture(&m_actor_texture);	
 	}
-
 	
+}
+
+
+void Actor::initialize_actor_hp(const sf::Vector2f& pos)
+{
+	m_hp_bar.setPosition(pos);
+	m_hp_bar.setSize(sf::Vector2f(m_hp_bar_size, 15.f));
+	m_hp_bar.setFillColor(sf::Color::Green);
+}
+
+void Actor::initialize_actor_name(const sf::Vector2f& pos, const std::string& name, const std::string& font_name)
+{
+	if (!m_font.loadFromFile(font_name))
+	{
+		//error::
+	}
+	m_actor_name.setCharacterSize(25);
+	m_actor_name.setFillColor(sf::Color::Black);
+	m_actor_name.setPosition(pos);
+	m_actor_name.setFont(m_font);
+	m_actor_name.setString(name);
+
+}
+
+void Actor::initialize_actor_color(float offset_player_gem_x, float offset_player_gem_y, const sf::Texture &gem_texture)
+{
+	m_actor_gem.setPosition(sf::Vector2f(offset_player_gem_x, offset_player_gem_y));
+	m_actor_gem.setTexture(&gem_texture);
+	m_actor_gem.setSize(sf::Vector2f(m_gem_size, m_gem_size));
+
 }
 
 void Actor::draw(sf::RenderWindow& window)
 {
 	window.draw(m_actor);
+	window.draw(m_hp_bar);
+	window.draw(m_actor_name);
+	window.draw(m_actor_gem);
 
 }
 
