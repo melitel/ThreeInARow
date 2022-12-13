@@ -39,8 +39,9 @@ void Actor::initialize_actor_name(const sf::Vector2f& pos, const std::string& na
 
 }
 
-void Actor::initialize_actor_color(float offset_player_gem_x, float offset_player_gem_y, const sf::Texture &gem_texture)
+void Actor::initialize_actor_color(float offset_player_gem_x, float offset_player_gem_y, uint32_t gem_color_id, sf::Texture &gem_texture)
 {
+	m_actor_gem_color_id = gem_color_id;
 	m_actor_gem.setPosition(sf::Vector2f(offset_player_gem_x, offset_player_gem_y));
 	m_actor_gem.setTexture(&gem_texture);
 	m_actor_gem.setSize(sf::Vector2f(m_gem_size, m_gem_size));
@@ -54,5 +55,23 @@ void Actor::draw(sf::RenderWindow& window)
 	window.draw(m_actor_name);
 	window.draw(m_actor_gem);
 
+}
+
+uint32_t Actor::return_actor_gem_color() {
+
+	return m_actor_gem_color_id;
+}
+
+
+void Actor::decrease_hp(uint32_t decrease_coefficient, bool update_pos) {
+
+	uint32_t hp_left = m_hp_bar_size - (10 * decrease_coefficient);
+	m_hp_bar.setSize(sf::Vector2f(hp_left, 15.f));
+	if (update_pos) {
+		auto pos = m_hp_bar.getPosition();
+		pos.x += 10 * decrease_coefficient;
+		m_hp_bar.setPosition(pos);
+	}
+	m_hp_bar_size = hp_left;
 }
 

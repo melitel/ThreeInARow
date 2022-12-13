@@ -12,9 +12,11 @@ public:
 	void initialize_actor(const sf::Vector2f& pos, const std::string& name);
 	void initialize_actor_hp(const sf::Vector2f& pos);
 	void initialize_actor_name(const sf::Vector2f& pos, const std::string& name, const std::string& font_name);
-	void initialize_actor_color(float offset_player_gem_x, float offset_player_gem_y, const sf::Texture &gem_texture);
+	void initialize_actor_color(float offset_player_gem_x, float offset_player_gem_y, uint32_t gem_color_id, sf::Texture& gem_texture);
 	void draw(sf::RenderWindow & window);
-	uint32_t get_width() const {return m_hero_width; }
+	uint32_t return_actor_gem_color();
+	void decrease_hp(uint32_t decrease_coefficient, bool update_pos);
+	uint32_t get_width() const { return m_hero_width; }
 
 private:
 	const uint32_t m_hero_width = 200;
@@ -22,10 +24,11 @@ private:
 	sf::RectangleShape m_actor;
 	sf::Texture m_actor_texture;
 	sf::RectangleShape m_hp_bar;
-	const uint32_t m_hp_bar_size = 380;
+	uint32_t m_hp_bar_size = 380;
 	sf::Text m_actor_name;
 	sf::Font m_font;
 	sf::RectangleShape m_actor_gem;
 	const float m_gem_size = 35.f;
+	uint32_t m_actor_gem_color_id{ 0 };
 };
 

@@ -44,21 +44,21 @@ void Game::run()
 						gather_input(mouse_position);
 					}
 				}
-				if (event.type == sf::Event::KeyPressed)
-				{
-					if (event.key.code == sf::Keyboard::Numpad1)
-					{
-						pain_it_black();
-					}					
-					if (event.key.code == sf::Keyboard::Numpad2)
-					{
-						gems_swap();
-					}
-					if (event.key.code == sf::Keyboard::Numpad3)
-					{
-						gems_fall();
-					}					
-				}
+// 				if (event.type == sf::Event::KeyPressed)
+// 				{
+// 					if (event.key.code == sf::Keyboard::Numpad1)
+// 					{
+// 						pain_it_black();
+// 					}					
+// 					if (event.key.code == sf::Keyboard::Numpad2)
+// 					{
+// 						gems_swap();
+// 					}
+// 					if (event.key.code == sf::Keyboard::Numpad3)
+// 					{
+// 						gems_fall();
+// 					}					
+// 				}
 			}
 
 			update();
@@ -114,15 +114,25 @@ void Game::initialize()
 	m_vs_tex.loadFromFile("vs.png");
 	m_vs.setTexture(&m_vs_tex);
 
-	m_hp_bar_hero.initialize_actor_hp(sf::Vector2f(10.f, 50.f));
-	m_hp_bar_monster.initialize_actor_hp(sf::Vector2f(460.f, 50.f));
+	m_hero_turn.setPosition(sf::Vector2f(10.f, 80.f));
+	m_hero_turn.setFillColor(sf::Color::Green);
+	m_hero_turn.setRadius(15.f);
 
-	m_hero_name.initialize_actor_name(sf::Vector2f(15.f, 10.f), "Archer", "arial.ttf");
+	m_monster_turn.setPosition(sf::Vector2f(810.f, 70.f));
+	m_monster_turn.setFillColor(sf::Color::Black);
+	m_monster_turn.setRadius(15.f);
 
-	m_monster_name.initialize_actor_name(sf::Vector2f(770.f, 10.f), "Mage", "arial.ttf");
+	m_player.initialize_actor_hp(sf::Vector2f(m_player_hp_x, m_player_hp_y));
+	m_monster.initialize_actor_hp(sf::Vector2f(m_monster_hp_x, m_monster_hp_y));
 
-	m_hero_gem.initialize_actor_color(105.f, 10.f, m_player_gems_colors[(player_gem_color)distr(gen)]);
-	m_monster_gem.initialize_actor_color(720.f, 10.f, m_player_gems_colors[(player_gem_color)distr(gen)]);
+	m_player.initialize_actor_name(sf::Vector2f(15.f, 10.f), "Archer", "arial.ttf");
+	m_monster.initialize_actor_name(sf::Vector2f(770.f, 10.f), "Mage", "arial.ttf");
+
+	uint32_t hero_gem_color_id = (player_gem_color)distr(gen);
+	uint32_t monster_gem_color_id = (player_gem_color)distr(gen);
+
+	m_player.initialize_actor_color(105.f, 10.f, hero_gem_color_id, m_player_gems_colors[hero_gem_color_id]);
+	m_monster.initialize_actor_color(720.f, 10.f, monster_gem_color_id, m_player_gems_colors[monster_gem_color_id]);
 	
 	float board_width = ((m_rows * m_gem_side) + ((m_rows + 1) * gem_offset));
 	float board_heights = ((m_columns * m_gem_side) + ((m_columns + 1) * gem_offset));
@@ -160,6 +170,8 @@ void Game::draw()
 	m_window.draw(m_board);
 	m_window.draw(m_background);
 	m_window.draw(m_vs);
+	m_window.draw(m_hero_turn);
+	m_window.draw(m_monster_turn);
 	
 
 	for (int i = 0; i < m_gems_array.size(); i++)
@@ -169,12 +181,6 @@ void Game::draw()
 	
 	m_player.draw(m_window);
 	m_monster.draw(m_window);
-	m_hp_bar_hero.draw(m_window);
-	m_hp_bar_monster.draw(m_window);
-	m_hero_name.draw(m_window);
-	m_monster_name.draw(m_window);
-	m_hero_gem.draw(m_window);
-	m_monster_gem.draw(m_window);
 	m_window.display();
 }
 
@@ -215,6 +221,7 @@ void Game::update()
 
 	if (m_game_state == game_state::gs_processing_move && !m_gems_to_destroy.empty())
 	{
+		gems_count();
 		pain_it_black();
 		m_game_state = game_state::gs_destroying;	
 			
@@ -263,11 +270,27 @@ void Game::update()
 					}
 				}
 				if (!m_gems_to_destroy.empty()) {
-					gems_swap();
-				}
-			}
+					gems_swap();					
+				}				
+				
+			}	
 		}
 		else {
+
+			damage_dealing();
+
+			if (m_player_turn == player::hero)
+			{
+				m_player_turn = player::monster;
+				m_monster_turn.setFillColor(sf::Color::Green);
+				m_hero_turn.setFillColor(sf::Color::Black);
+			}
+			else {
+				m_player_turn = player::hero;
+				m_hero_turn.setFillColor(sf::Color::Green);
+				m_monster_turn.setFillColor(sf::Color::Black);
+			}
+
 			m_game_state = game_state::gs_waiting_for_move;
 		}
 	}
@@ -465,6 +488,33 @@ void Game::move_check(uint32_t index, gem_color color) {
 
 }
 
+void Game::gems_count() {
+	for (auto it = m_gems_to_destroy.cbegin(); it != m_gems_to_destroy.cend(); ++it)
+	{
+		uint32_t index = *it;
+		if (m_gems_array[index].color == gem_color::gc_orange)
+		{
+			++m_destroyed_gems[0];
+		}
+		if (m_gems_array[index].color == gem_color::gc_green)
+		{
+			++m_destroyed_gems[1];
+		}
+		if (m_gems_array[index].color == gem_color::gc_red)
+		{
+			++m_destroyed_gems[2];
+		}
+		if (m_gems_array[index].color == gem_color::gc_blue)
+		{
+			++m_destroyed_gems[3];
+		}
+		if (m_gems_array[index].color == gem_color::gc_violet)
+		{
+			++m_destroyed_gems[4];
+		}
+	}
+}
+
 void Game:: pain_it_black() {	
 	for (auto it = m_gems_to_destroy.cbegin(); it != m_gems_to_destroy.cend(); ++it)
 	{
@@ -502,37 +552,24 @@ void Game::gems_swap() {
 			}
 		}
 	}
-
-	//m_gems_to_destroy.clear();
 }
 
-void Game::gems_fall() {
+void Game::damage_dealing() {
 
-	
-
-	for (int32_t i = ((m_rows * m_columns) - 1); i >= 0; i -= 8)
+	if (m_player_turn == player::hero)
 	{
-
-		for (int32_t j = 0; j < m_rows; ++j) {
-
-			int32_t index = i - j;
-			gem_color color = m_gems_array[index].color;
-			move_check(index, color);
-
-			if (!m_gems_to_destroy.empty()) {
-				for (auto& gem_id : m_gems_to_destroy)
-				{
-					gem_color additional_color = m_gems_array[gem_id].color;
-					move_check(gem_id, additional_color);
-				}
-
-				pain_it_black();
-				//gems_swap();
-
-				//i = ((m_rows * m_columns) - 1);
-				//j = 0;
-				break;
-			}
+		if (m_destroyed_gems[m_player.return_actor_gem_color()] > 0)
+		{
+			m_monster.decrease_hp(m_destroyed_gems[m_player.return_actor_gem_color()], true);
+			m_destroyed_gems.fill(0);
+		}
+	}
+	if (m_player_turn == player::monster)
+	{
+		if (m_destroyed_gems[m_monster.return_actor_gem_color()] > 0)
+		{
+			m_player.decrease_hp(m_destroyed_gems[m_monster.return_actor_gem_color()], false);
+			m_destroyed_gems.fill(0);
 		}
 	}
 }

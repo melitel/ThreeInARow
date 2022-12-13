@@ -17,12 +17,6 @@ private:
 
 	Actor m_player;
 	Actor m_monster;
-	Actor m_hp_bar_hero;
-	Actor m_hp_bar_monster;
-	Actor m_hero_name;
-	Actor m_monster_name;
-	Actor m_hero_gem;
-	Actor m_monster_gem;
 
 	void initialize();
 	void draw();
@@ -38,13 +32,17 @@ private:
 		fade_animation,
 		swap_animation
 	};
+
+	enum class player { hero, monster };
+	player m_player_turn{ player::hero };
 	
 	void load_textures(std::string file_path, gem_color index);
 	void load_player_gem_textures(std::string file_path, Game::player_gem_color index);
 	uint32_t searchCol(uint32_t index_1, uint32_t index_2);
+	void damage_dealing();
+	void gems_count();
 
 	void move_check(uint32_t index, gem_color color);
-	void gems_fall();
 	void gems_swap();
 	struct Gem {
 		sf::RectangleShape rect;
@@ -71,6 +69,10 @@ private:
 	const uint32_t m_window_height = 600;
 	const float m_gem_side = 48.f;
 	const float m_vs_side = 50.f;
+	const float m_monster_hp_x = 460.f;
+	const float m_monster_hp_y = 50.f;
+	const float m_player_hp_x = 10.f;
+	const float m_player_hp_y = 50.f;
 	const float gem_offset{ 5 };
 	const float actor_offset_y{ 100 };
 	bool m_success_move{ false };
@@ -87,6 +89,8 @@ private:
 	sf::RectangleShape m_background;
 	sf::RectangleShape m_vs;
 	sf::RectangleShape m_gem;	
+	sf::CircleShape m_hero_turn;
+	sf::CircleShape m_monster_turn;
 	sf::Texture m_gems_texture;	
 	sf::Texture m_background_tex;
 	sf::Texture m_vs_tex;	
@@ -97,6 +101,7 @@ private:
 	std::array<Game::Gem, 64> m_gems_array;
 	std::array<sf::Texture, gc_count> m_colors;
 	std::array<sf::Texture, pgc_count> m_player_gems_colors;
+	std::array<uint32_t, pgc_count> m_destroyed_gems;
 	std::set<uint32_t> m_gems_to_destroy;
 
 	std::random_device rd; // obtain a random number from hardware
@@ -112,4 +117,3 @@ private:
 	uint64_t m_frame_id{ 0 };
 
 };
-
