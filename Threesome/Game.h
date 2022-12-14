@@ -58,7 +58,7 @@ private:
 		gs_processing_move,
 		gs_destroying,
 		gs_swapping,
-		gs_gems_fall
+		gs_round_finished
 	};
 	
 	game_state m_game_state;
@@ -67,6 +67,8 @@ private:
 	//SFML graphics objects
 	const uint32_t m_window_width = 850;
 	const uint32_t m_window_height = 600;
+	const uint32_t m_finish_board_width = 300;
+	const uint32_t m_finish_board_height = 150;
 	const float m_gem_side = 48.f;
 	const float m_vs_side = 50.f;
 	const float m_monster_hp_x = 460.f;
@@ -86,6 +88,7 @@ private:
 	sf::RectangleShape m_upper_border;
 	sf::RectangleShape m_lower_border;
 	sf::RectangleShape m_board;
+	sf::RectangleShape m_finish_board;
 	sf::RectangleShape m_background;
 	sf::RectangleShape m_vs;
 	sf::RectangleShape m_gem;	
@@ -93,7 +96,9 @@ private:
 	sf::CircleShape m_monster_turn;
 	sf::Texture m_gems_texture;	
 	sf::Texture m_background_tex;
-	sf::Texture m_vs_tex;	
+	sf::Texture m_vs_tex;
+	sf::Text m_who_wins;
+	sf::Font m_game_font;
 	
 	const uint32_t m_sprite_width = 500;
 	

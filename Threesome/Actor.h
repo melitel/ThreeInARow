@@ -16,6 +16,7 @@ public:
 	void draw(sf::RenderWindow & window);
 	uint32_t return_actor_gem_color();
 	void decrease_hp(uint32_t decrease_coefficient, bool update_pos);
+	uint32_t return_actor_hp_left();
 	uint32_t get_width() const { return m_hero_width; }
 
 private:
@@ -24,7 +25,7 @@ private:
 	sf::RectangleShape m_actor;
 	sf::Texture m_actor_texture;
 	sf::RectangleShape m_hp_bar;
-	uint32_t m_hp_bar_size = 380;
+	int32_t m_hp_bar_size = 380;
 	sf::Text m_actor_name;
 	sf::Font m_font;
 	sf::RectangleShape m_actor_gem;

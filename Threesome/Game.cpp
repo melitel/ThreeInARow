@@ -87,6 +87,10 @@ void Game::load_player_gem_textures(std::string file_path, Game::player_gem_colo
 
 void Game::initialize()
 {
+	if (!m_game_font.loadFromFile("arial.ttf"))
+	{
+		//error::
+	}
 
 	load_textures("gem_sprite1.png", gc_orange);
 	load_textures("gem_sprite6.png", gc_green);
@@ -138,7 +142,16 @@ void Game::initialize()
 	float board_heights = ((m_columns * m_gem_side) + ((m_columns + 1) * gem_offset));
 	m_board.setSize(sf::Vector2f(board_width, board_heights));
 	m_board.setFillColor(sf::Color::Black);
-	m_board.setPosition(sf::Vector2f(200.f, 100.f));		
+	m_board.setPosition(sf::Vector2f(200.f, 100.f));	
+
+	m_finish_board.setSize(sf::Vector2f(m_finish_board_width, m_finish_board_height));
+	m_finish_board.setFillColor(sf::Color::Black);
+	m_finish_board.setPosition(sf::Vector2f(275.f, 225.f));
+	m_who_wins.setCharacterSize(25);
+	m_who_wins.setFillColor(sf::Color::White);
+	m_who_wins.setPosition(sf::Vector2f(350.f, 275.f));
+	m_who_wins.setString("Who wins?");
+	m_who_wins.setFont(m_game_font);
 
 	for (uint32_t i = 0; i < m_rows; i++) {
 
@@ -166,21 +179,43 @@ void Game::initialize()
 void Game::draw()
 {
 	// clear the window with black color
-	m_window.clear(sf::Color::Black);
-	m_window.draw(m_board);
-	m_window.draw(m_background);
-	m_window.draw(m_vs);
-	m_window.draw(m_hero_turn);
-	m_window.draw(m_monster_turn);
+	m_window.clear(sf::Color::Black);  	
 	
 
-	for (int i = 0; i < m_gems_array.size(); i++)
-	{
-		m_window.draw(m_gems_array[i].rect);
+	if (m_game_state == game_state::gs_round_finished)
+	{	
+		if (m_player_turn == player::hero)
+		{
+			m_who_wins.setString("Archer wins!");
+		}
+		else
+		{
+			m_who_wins.setString("Mage wins!");
+		}
+		m_window.draw(m_background);	
+		m_window.draw(m_finish_board);
+		m_window.draw(m_who_wins);
+
 	}
+	else {
+
+		m_window.draw(m_board);
+		m_window.draw(m_background);
+		m_window.draw(m_vs);
+		m_window.draw(m_hero_turn);
+		m_window.draw(m_monster_turn);
 	
-	m_player.draw(m_window);
-	m_monster.draw(m_window);
+
+		for (int i = 0; i < m_gems_array.size(); i++)
+		{
+			m_window.draw(m_gems_array[i].rect);
+		}
+	
+		m_player.draw(m_window);
+		m_monster.draw(m_window);
+	
+	}
+
 	m_window.display();
 }
 
@@ -277,23 +312,38 @@ void Game::update()
 		}
 		else {
 
-			damage_dealing();
+			damage_dealing();			
 
-			if (m_player_turn == player::hero)
-			{
-				m_player_turn = player::monster;
-				m_monster_turn.setFillColor(sf::Color::Green);
-				m_hero_turn.setFillColor(sf::Color::Black);
+			int32_t player_hp_left = m_player.return_actor_hp_left();
+			int32_t monster_hp_left = m_monster.return_actor_hp_left();
+
+			if (player_hp_left <= 0 || monster_hp_left <= 0)
+			{			
+				m_game_state = game_state::gs_round_finished;
 			}
 			else {
-				m_player_turn = player::hero;
-				m_hero_turn.setFillColor(sf::Color::Green);
-				m_monster_turn.setFillColor(sf::Color::Black);
-			}
 
-			m_game_state = game_state::gs_waiting_for_move;
+				if (m_player_turn == player::hero)
+				{
+					m_player_turn = player::monster;
+					uint32_t hero_gem_color_id = (player_gem_color)distr(gen);
+					m_player.initialize_actor_color(105.f, 10.f, hero_gem_color_id, m_player_gems_colors[hero_gem_color_id]);
+					m_monster_turn.setFillColor(sf::Color::Green);
+					m_hero_turn.setFillColor(sf::Color::Black);
+				}
+				else {
+					m_player_turn = player::hero;
+					uint32_t monster_gem_color_id = (player_gem_color)distr(gen);
+					m_monster.initialize_actor_color(720.f, 10.f, monster_gem_color_id, m_player_gems_colors[monster_gem_color_id]);
+					m_hero_turn.setFillColor(sf::Color::Green);
+					m_monster_turn.setFillColor(sf::Color::Black);
+				}
+				
+				m_game_state = game_state::gs_waiting_for_move;
+			}
 		}
 	}
+	
 
 // 	if (m_game_state == game_state::gs_gems_fall) {
 // 

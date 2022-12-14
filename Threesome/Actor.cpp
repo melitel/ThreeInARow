@@ -65,13 +65,26 @@ uint32_t Actor::return_actor_gem_color() {
 
 void Actor::decrease_hp(uint32_t decrease_coefficient, bool update_pos) {
 
-	uint32_t hp_left = m_hp_bar_size - (10 * decrease_coefficient);
+	//m_hp_bar_size = 380;
+	int32_t hp_left = m_hp_bar_size - (100 * decrease_coefficient);
+
+	if (hp_left < 0)
+	{
+		hp_left = 0;
+	}
+
 	m_hp_bar.setSize(sf::Vector2f(hp_left, 15.f));
 	if (update_pos) {
 		auto pos = m_hp_bar.getPosition();
 		pos.x += 10 * decrease_coefficient;
 		m_hp_bar.setPosition(pos);
 	}
+	
 	m_hp_bar_size = hp_left;
+}
+
+uint32_t Actor::return_actor_hp_left() {
+
+	return m_hp_bar_size;
 }
 
