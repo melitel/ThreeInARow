@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2022 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2023 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -29,6 +29,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include <SFML/Window/Export.hpp>
+#include <SFML/System/NonCopyable.hpp>
 
 
 namespace sf
@@ -36,7 +37,7 @@ namespace sf
 
 class Context;
 
-using ContextDestroyCallback = void (*)(void*);
+typedef void(*ContextDestroyCallback)(void*);
 
 ////////////////////////////////////////////////////////////
 /// \brief Base class for classes that require an OpenGL context
@@ -45,6 +46,7 @@ using ContextDestroyCallback = void (*)(void*);
 class SFML_WINDOW_API GlResource
 {
 protected:
+
     ////////////////////////////////////////////////////////////
     /// \brief Default constructor
     ///
@@ -74,7 +76,7 @@ protected:
     /// \brief RAII helper class to temporarily lock an available context for use
     ///
     ////////////////////////////////////////////////////////////
-    class SFML_WINDOW_API TransientContextLock
+    class SFML_WINDOW_API TransientContextLock : NonCopyable
     {
     public:
         ////////////////////////////////////////////////////////////
@@ -88,18 +90,6 @@ protected:
         ///
         ////////////////////////////////////////////////////////////
         ~TransientContextLock();
-
-        ////////////////////////////////////////////////////////////
-        /// \brief Deleted copy constructor
-        ///
-        ////////////////////////////////////////////////////////////
-        TransientContextLock(const TransientContextLock&) = delete;
-
-        ////////////////////////////////////////////////////////////
-        /// \brief Deleted copy assignment
-        ///
-        ////////////////////////////////////////////////////////////
-        TransientContextLock& operator=(const TransientContextLock&) = delete;
     };
 };
 

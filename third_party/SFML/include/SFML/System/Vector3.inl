@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2022 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2023 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -25,29 +25,30 @@
 
 ////////////////////////////////////////////////////////////
 template <typename T>
-constexpr Vector3<T>::Vector3() : x(0), y(0), z(0)
+inline Vector3<T>::Vector3() :
+x(0),
+y(0),
+z(0)
 {
+
 }
 
 
 ////////////////////////////////////////////////////////////
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wshadow"
-#endif
 template <typename T>
-constexpr Vector3<T>::Vector3(T x, T y, T z) : x(x), y(y), z(z)
+inline Vector3<T>::Vector3(T X, T Y, T Z) :
+x(X),
+y(Y),
+z(Z)
 {
+
 }
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
 
 
 ////////////////////////////////////////////////////////////
 template <typename T>
 template <typename U>
-constexpr Vector3<T>::Vector3(const Vector3<U>& vector) :
+inline Vector3<T>::Vector3(const Vector3<U>& vector) :
 x(static_cast<T>(vector.x)),
 y(static_cast<T>(vector.y)),
 z(static_cast<T>(vector.z))
@@ -57,50 +58,7 @@ z(static_cast<T>(vector.z))
 
 ////////////////////////////////////////////////////////////
 template <typename T>
-constexpr T Vector3<T>::lengthSq() const
-{
-    return dot(*this);
-}
-
-
-////////////////////////////////////////////////////////////
-template <typename T>
-constexpr T Vector3<T>::dot(const Vector3<T>& rhs) const
-{
-    return x * rhs.x + y * rhs.y + z * rhs.z;
-}
-
-
-////////////////////////////////////////////////////////////
-template <typename T>
-constexpr Vector3<T> Vector3<T>::cross(const Vector3<T>& rhs) const
-{
-    return Vector3<T>((y * rhs.z) - (z * rhs.y), (z * rhs.x) - (x * rhs.z), (x * rhs.y) - (y * rhs.x));
-}
-
-
-////////////////////////////////////////////////////////////
-template <typename T>
-constexpr Vector3<T> Vector3<T>::cwiseMul(const Vector3<T>& rhs) const
-{
-    return Vector3<T>(x * rhs.x, y * rhs.y, z * rhs.z);
-}
-
-
-////////////////////////////////////////////////////////////
-template <typename T>
-constexpr Vector3<T> Vector3<T>::cwiseDiv(const Vector3<T>& rhs) const
-{
-    assert(rhs.x != 0);
-    assert(rhs.y != 0);
-    assert(rhs.z != 0);
-    return Vector3<T>(x / rhs.x, y / rhs.y, z / rhs.z);
-}
-
-
-////////////////////////////////////////////////////////////
-template <typename T>
-constexpr Vector3<T> operator-(const Vector3<T>& left)
+inline Vector3<T> operator -(const Vector3<T>& left)
 {
     return Vector3<T>(-left.x, -left.y, -left.z);
 }
@@ -108,7 +66,7 @@ constexpr Vector3<T> operator-(const Vector3<T>& left)
 
 ////////////////////////////////////////////////////////////
 template <typename T>
-constexpr Vector3<T>& operator+=(Vector3<T>& left, const Vector3<T>& right)
+inline Vector3<T>& operator +=(Vector3<T>& left, const Vector3<T>& right)
 {
     left.x += right.x;
     left.y += right.y;
@@ -120,7 +78,7 @@ constexpr Vector3<T>& operator+=(Vector3<T>& left, const Vector3<T>& right)
 
 ////////////////////////////////////////////////////////////
 template <typename T>
-constexpr Vector3<T>& operator-=(Vector3<T>& left, const Vector3<T>& right)
+inline Vector3<T>& operator -=(Vector3<T>& left, const Vector3<T>& right)
 {
     left.x -= right.x;
     left.y -= right.y;
@@ -132,7 +90,7 @@ constexpr Vector3<T>& operator-=(Vector3<T>& left, const Vector3<T>& right)
 
 ////////////////////////////////////////////////////////////
 template <typename T>
-constexpr Vector3<T> operator+(const Vector3<T>& left, const Vector3<T>& right)
+inline Vector3<T> operator +(const Vector3<T>& left, const Vector3<T>& right)
 {
     return Vector3<T>(left.x + right.x, left.y + right.y, left.z + right.z);
 }
@@ -140,7 +98,7 @@ constexpr Vector3<T> operator+(const Vector3<T>& left, const Vector3<T>& right)
 
 ////////////////////////////////////////////////////////////
 template <typename T>
-constexpr Vector3<T> operator-(const Vector3<T>& left, const Vector3<T>& right)
+inline Vector3<T> operator -(const Vector3<T>& left, const Vector3<T>& right)
 {
     return Vector3<T>(left.x - right.x, left.y - right.y, left.z - right.z);
 }
@@ -148,7 +106,7 @@ constexpr Vector3<T> operator-(const Vector3<T>& left, const Vector3<T>& right)
 
 ////////////////////////////////////////////////////////////
 template <typename T>
-constexpr Vector3<T> operator*(const Vector3<T>& left, T right)
+inline Vector3<T> operator *(const Vector3<T>& left, T right)
 {
     return Vector3<T>(left.x * right, left.y * right, left.z * right);
 }
@@ -156,7 +114,7 @@ constexpr Vector3<T> operator*(const Vector3<T>& left, T right)
 
 ////////////////////////////////////////////////////////////
 template <typename T>
-constexpr Vector3<T> operator*(T left, const Vector3<T>& right)
+inline Vector3<T> operator *(T left, const Vector3<T>& right)
 {
     return Vector3<T>(right.x * left, right.y * left, right.z * left);
 }
@@ -164,7 +122,7 @@ constexpr Vector3<T> operator*(T left, const Vector3<T>& right)
 
 ////////////////////////////////////////////////////////////
 template <typename T>
-constexpr Vector3<T>& operator*=(Vector3<T>& left, T right)
+inline Vector3<T>& operator *=(Vector3<T>& left, T right)
 {
     left.x *= right;
     left.y *= right;
@@ -176,7 +134,7 @@ constexpr Vector3<T>& operator*=(Vector3<T>& left, T right)
 
 ////////////////////////////////////////////////////////////
 template <typename T>
-constexpr Vector3<T> operator/(const Vector3<T>& left, T right)
+inline Vector3<T> operator /(const Vector3<T>& left, T right)
 {
     return Vector3<T>(left.x / right, left.y / right, left.z / right);
 }
@@ -184,7 +142,7 @@ constexpr Vector3<T> operator/(const Vector3<T>& left, T right)
 
 ////////////////////////////////////////////////////////////
 template <typename T>
-constexpr Vector3<T>& operator/=(Vector3<T>& left, T right)
+inline Vector3<T>& operator /=(Vector3<T>& left, T right)
 {
     left.x /= right;
     left.y /= right;
@@ -196,7 +154,7 @@ constexpr Vector3<T>& operator/=(Vector3<T>& left, T right)
 
 ////////////////////////////////////////////////////////////
 template <typename T>
-constexpr bool operator==(const Vector3<T>& left, const Vector3<T>& right)
+inline bool operator ==(const Vector3<T>& left, const Vector3<T>& right)
 {
     return (left.x == right.x) && (left.y == right.y) && (left.z == right.z);
 }
@@ -204,7 +162,7 @@ constexpr bool operator==(const Vector3<T>& left, const Vector3<T>& right)
 
 ////////////////////////////////////////////////////////////
 template <typename T>
-constexpr bool operator!=(const Vector3<T>& left, const Vector3<T>& right)
+inline bool operator !=(const Vector3<T>& left, const Vector3<T>& right)
 {
     return (left.x != right.x) || (left.y != right.y) || (left.z != right.z);
 }
