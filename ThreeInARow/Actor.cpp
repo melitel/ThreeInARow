@@ -1,22 +1,17 @@
 #include "Actor.h"
 #include<iostream>
 #include <cmath>
+#include "TextureManager.h"
+#include "Random.h"
 
 void Actor::initialize_actor(const sf::Vector2f & pos, const std::string & name)
 {
 	
 	m_actor.setPosition(pos);
 	m_actor.setSize(sf::Vector2f((float) m_hero_width, (float) m_hero_height));
-	if (!m_actor_texture.loadFromFile(name))
-	{
-		m_actor.setFillColor(sf::Color::Red);
-	}
-	else {
-		m_actor.setTexture(&m_actor_texture);	
-	}
-	
+	m_actor_texture = &TextureManager::GetTexture(name);
+	m_actor.setTexture(m_actor_texture);
 }
-
 
 void Actor::initialize_actor_hp(const sf::Vector2f& pos)
 {
@@ -39,11 +34,12 @@ void Actor::initialize_actor_name(const sf::Vector2f& pos, const std::string& na
 
 }
 
-void Actor::initialize_actor_color(float offset_player_gem_x, float offset_player_gem_y, uint32_t gem_color_id, sf::Texture &gem_texture)
+void Actor::initialize_actor_color(float offset_player_gem_x, float offset_player_gem_y)
 {
-	m_actor_gem_color_id = gem_color_id;
+	player_gem_color actor_gem_color = (player_gem_color)distr(gen);
 	m_actor_gem.setPosition(sf::Vector2f(offset_player_gem_x, offset_player_gem_y));
-	m_actor_gem.setTexture(&gem_texture);
+	m_gems_texture = &TextureManager::GetTexture(gem_texture_filename(actor_gem_color));
+	m_actor_gem.setTexture(m_gems_texture);
 	m_actor_gem.setSize(sf::Vector2f(m_gem_size, m_gem_size));
 
 }
@@ -54,7 +50,6 @@ void Actor::draw(std::unique_ptr<sf::RenderWindow>& window)
 	window->draw(m_hp_bar);
 	window->draw(m_actor_name);
 	window->draw(m_actor_gem);
-
 }
 
 uint32_t Actor::return_actor_gem_color() {
@@ -64,9 +59,8 @@ uint32_t Actor::return_actor_gem_color() {
 
 
 void Actor::decrease_hp(uint32_t decrease_coefficient, bool update_pos) {
-
-	//m_hp_bar_size = 380;
-	int32_t hp_left = m_hp_bar_size - (100 * decrease_coefficient);
+		
+	int32_t hp_left = m_hp_bar_size - (10 * decrease_coefficient);
 
 	if (hp_left < 0)
 	{
@@ -86,5 +80,32 @@ void Actor::decrease_hp(uint32_t decrease_coefficient, bool update_pos) {
 uint32_t Actor::return_actor_hp_left() {
 
 	return m_hp_bar_size;
+}
+
+const std::string Actor::gem_texture_filename(player_gem_color color)
+{
+	std::string actorFileName;
+
+	switch (color) {
+	case player_gem_color::pgc_orange:
+		actorFileName = "orange.png";
+		break;
+	case player_gem_color::pgc_green:
+		actorFileName = "green.png";
+		break;
+	case player_gem_color::pgc_red:
+		actorFileName = "red.png";
+		break;
+	case player_gem_color::pgc_blue:
+		actorFileName = "blue.png";
+		break;
+	case player_gem_color::pgc_violet:
+		actorFileName = "violet.png";
+		break;	
+	default:
+		break;
+	}
+
+	return actorFileName;
 }
 

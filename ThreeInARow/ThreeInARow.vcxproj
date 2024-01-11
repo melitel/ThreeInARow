@@ -95,14 +95,21 @@ XCOPY $(SolutionDir)textures\ $(OutDir) /i /c /k /y /d</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="Board.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Actor.cpp" />
+    <ClCompile Include="Gem.cpp" />
+    <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="ThreeInARow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
+    <ClInclude Include="Board.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Actor.h" />
+    <ClInclude Include="Gem.h" />
+    <ClInclude Include="Random.h" />
+    <ClInclude Include="TextureManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
