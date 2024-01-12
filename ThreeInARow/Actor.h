@@ -33,7 +33,7 @@ private:
 	sf::RectangleShape m_actor_gem;
 	sf::Texture* m_gems_texture;
 	const float m_gem_size = 35.f;
-	uint32_t m_actor_gem_color_id{ 0 };
+	player_gem_color m_actor_gem_color_id{ pgc_orange };
 
 	const std::string gem_texture_filename(player_gem_color color);
 };
